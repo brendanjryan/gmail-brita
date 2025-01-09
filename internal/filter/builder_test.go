@@ -10,9 +10,21 @@ import (
 
 // testdataPath returns an absolute path to a file in the testdata directory
 func testdataPath(elem ...string) string {
-	// Start with the current directory and walk up until we find testdata
+	// Try module root first (CI environment)
+	moduleRoot := os.Getenv("GITHUB_WORKSPACE")
+	if moduleRoot == "" {
+		// Fallback to relative path for local development
+		moduleRoot = "."
+	}
+
+	path := filepath.Join(moduleRoot, "internal", "testdata", filepath.Join(elem...))
+	if _, err := os.Stat(path); err == nil {
+		return path
+	}
+
+	// Fallback to walking up directories
 	dir := "."
-	for i := 0; i < 3; i++ { // Try up to 3 levels up
+	for i := 0; i < 3; i++ {
 		path := filepath.Join(dir, "internal", "testdata", filepath.Join(elem...))
 		if _, err := os.Stat(path); err == nil {
 			return path
