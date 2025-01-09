@@ -1,0 +1,58 @@
+# Gmail filter configuration
+me:
+  - me@example.com
+  - other@example.com
+
+filters:
+  # Mailing list filters
+  - name: "Project Mailing List"
+    has:
+      - "list:discuss@lists.some-project.org"
+    actions:
+      - label: "some-project"
+      - archive_unless_directed: true
+
+  # Work email filters with if/else chain
+  - name: "Important Work Emails"
+    has:
+      - "list:robots@bigco.com"
+      - "subject:Important"
+    actions:
+      - label: "work/robots/important"
+    otherwise:
+      - name: "Irrelevant Work Emails"
+        has:
+          - "list:robots@bigco.com"
+          - "subject:Chunder"
+        actions:
+          - label: "work/robots/irrelevant"
+          - archive_unless_directed:
+              mark_read: true
+        otherwise:
+          - name: "Semi-relevant Work Emails"
+            has:
+              - "list:robots@bigco.com"
+              - "subject:Semirelevant"
+            actions:
+              - label: "work/robots/meh"
+              - archive_unless_directed: true
+
+  # Personal email filters
+  - name: "Family Emails"
+    has:
+      - "from:family@example.com"
+    actions:
+      - label: "personal/family"
+      - star: true
+      - never_spam: true
+
+  # Newsletter filters
+  - name: "Newsletters"
+    has:
+      - "from:newsletter@example.com"
+    has_not:
+      - "subject:important"
+    actions:
+      - label: "newsletters"
+      - archive_unless_directed:
+          mark_read: true 

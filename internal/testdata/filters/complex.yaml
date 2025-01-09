@@ -1,0 +1,28 @@
+emails:
+  - me@example.com
+  - other@example.com
+
+filters:
+  - name: Complex Test Filter
+    conditions:
+      has:
+        - test:condition
+        - from:test@example.com
+      has_not:
+        - to:me@example.com
+        - cc:me@example.com
+    actions:
+      label: test-label
+      archive: true
+      mark_read: true
+      star: true
+      never_spam: true
+
+  - name: List Filter
+    conditions:
+      has:
+        - list:test@example.com
+    actions:
+      label: test-list
+      archive_unless_directed:
+        mark_read: true 

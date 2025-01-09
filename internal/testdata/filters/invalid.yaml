@@ -1,0 +1,44 @@
+emails:
+  - invalid@@example.com  # Invalid email format
+  - ""  # Empty email
+
+filters:
+  - name: ""  # Empty name
+    conditions:
+      has:
+        - from:test@test.com
+    actions:
+      label: test-label
+
+  - name: "Missing Conditions"
+    actions:
+      label: test-label
+
+  - name: "Invalid Action"
+    conditions:
+      has:
+        - from:user@example.com
+    actions:
+      unknown_action: true
+
+  - name: "Invalid Condition Format"
+    conditions:
+      has:
+        - "malformed condition without colon"
+    actions:
+      label: test-label
+
+  - name: "Empty Conditions"
+    conditions:
+      has: []
+      has_not: []
+    actions:
+      label: test-label
+
+  - name: "Duplicate Labels"
+    conditions:
+      has:
+        - from:user@test.com
+    actions:
+      label: same-label
+      label: same-label  # Duplicate label 

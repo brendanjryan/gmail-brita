@@ -1,0 +1,33 @@
+linters:
+  enable:
+    - gofmt
+    - revive
+    - govet
+    - errcheck
+    - staticcheck
+    - gosimple
+    - ineffassign
+    - unconvert
+    - misspell
+    - gosec
+
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  exclude-dirs:
+    - bin
+    - examples/output
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gosec
+
+linters-settings:
+  gofmt:
+    simplify: true
+  gosec:
+    excludes:
+      - G204 # Subprocess launched with variable
+      - G306 # File permissions too permissive 

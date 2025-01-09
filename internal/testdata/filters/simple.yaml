@@ -1,0 +1,12 @@
+emails:
+  - me@example.com
+
+filters:
+  - name: Simple Test Filter
+    conditions:
+      has:
+        - test:condition
+    actions:
+      label: test-label
+      archive_unless_directed:
+        mark_read: false 
