@@ -4,17 +4,22 @@ import (
 	"encoding/xml"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
 
 // testdataPath returns an absolute path to a file in the testdata directory
 func testdataPath(elem ...string) string {
-	_, filename, _, _ := runtime.Caller(0)
-	// Get the project root directory by going up two levels from the test file
-	rootDir := filepath.Join(filepath.Dir(filename), "..")
-	return filepath.Join(rootDir, "testdata", filepath.Join(elem...))
+	// Start with the current directory and walk up until we find testdata
+	dir := "."
+	for i := 0; i < 3; i++ { // Try up to 3 levels up
+		path := filepath.Join(dir, "internal", "testdata", filepath.Join(elem...))
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+		dir = filepath.Join(dir, "..")
+	}
+	return filepath.Join("internal", "testdata", filepath.Join(elem...))
 }
 
 func TestBuilder(t *testing.T) {
