@@ -3,11 +3,27 @@ package britta
 import (
 	"encoding/xml"
 	"os"
-	"strings"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/brendanryan/gmail-brita/internal/config"
 )
+
+// testdataPath returns an absolute path to a file in the testdata directory
+func testdataPath(elem ...string) string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(filename), "..", "..", "internal", "testdata", filepath.Join(elem...))
+}
+
+// normalizeXML normalizes XML for comparison
+func normalizeXML(data []byte) ([]byte, error) {
+	var v interface{}
+	if err := xml.Unmarshal(data, &v); err != nil {
+		return nil, err
+	}
+	return xml.MarshalIndent(v, "", "  ")
+}
 
 func TestFilterSetIntegration(t *testing.T) {
 	tests := []struct {
@@ -17,83 +33,48 @@ func TestFilterSetIntegration(t *testing.T) {
 	}{
 		{
 			name:     "simple filter",
-			yamlFile: "../../internal/testdata/filters/simple.yaml",
-			xmlFile:  "../../internal/testdata/golden/simple.xml",
+			yamlFile: testdataPath("filters", "simple.yaml"),
+			xmlFile:  testdataPath("golden", "simple.xml"),
 		},
 		{
 			name:     "complex filter",
-			yamlFile: "../../internal/testdata/filters/complex.yaml",
-			xmlFile:  "../../internal/testdata/golden/complex.xml",
+			yamlFile: testdataPath("filters", "complex.yaml"),
+			xmlFile:  testdataPath("golden", "complex.xml"),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Load config
+			// Read and normalize expected XML
+			expected, err := os.ReadFile(tt.xmlFile)
+			if err != nil {
+				t.Fatalf("Failed to read golden file: %v", err)
+			}
+			expectedNorm, err := normalizeXML(expected)
+			if err != nil {
+				t.Fatalf("Failed to normalize expected XML: %v", err)
+			}
+
+			// Load and parse YAML config
 			cfg, err := config.LoadFromFile(tt.yamlFile)
 			if err != nil {
 				t.Fatalf("Failed to load config: %v", err)
 			}
 
-			// Read expected XML
-			expected, err := os.ReadFile(tt.xmlFile)
-			if err != nil {
-				t.Fatalf("Failed to read golden file: %v", err)
-			}
-			expected = normalizeXML(expected)
-
-			// Generate filters
+			// Generate XML
 			got, err := GenerateXML(cfg)
 			if err != nil {
 				t.Fatalf("GenerateXML() error = %v", err)
 			}
-			got = normalizeXML(got)
+			gotNorm, err := normalizeXML(got)
+			if err != nil {
+				t.Fatalf("Failed to normalize generated XML: %v", err)
+			}
 
 			// Compare
-			if string(got) != string(expected) {
-				t.Errorf("XML mismatch (-want +got):\n%s", diffStrings(string(expected), string(got)))
+			if string(gotNorm) != string(expectedNorm) {
+				t.Errorf("XML mismatch\nExpected:\n%s\n\nGot:\n%s", string(expectedNorm), string(gotNorm))
 			}
 		})
 	}
-}
-
-// Helper functions
-
-func normalizeXML(data []byte) []byte {
-	var v interface{}
-	if err := xml.Unmarshal(data, &v); err != nil {
-		return data
-	}
-	normalized, err := xml.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return data
-	}
-	return normalized
-}
-
-func diffStrings(expected, actual string) string {
-	// Simple diff implementation
-	expectedLines := strings.Split(expected, "\n")
-	actualLines := strings.Split(actual, "\n")
-	var diff strings.Builder
-
-	for i := 0; i < len(expectedLines) || i < len(actualLines); i++ {
-		if i >= len(expectedLines) {
-			diff.WriteString("+")
-			diff.WriteString(actualLines[i])
-			diff.WriteString("\n")
-		} else if i >= len(actualLines) {
-			diff.WriteString("-")
-			diff.WriteString(expectedLines[i])
-			diff.WriteString("\n")
-		} else if expectedLines[i] != actualLines[i] {
-			diff.WriteString("-")
-			diff.WriteString(expectedLines[i])
-			diff.WriteString("\n+")
-			diff.WriteString(actualLines[i])
-			diff.WriteString("\n")
-		}
-	}
-
-	return diff.String()
 }

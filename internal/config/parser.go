@@ -36,8 +36,8 @@ func validateConfig(config *Config) error {
 		return fmt.Errorf("no filters specified")
 	}
 
-	for i, filter := range config.Filters {
-		if err := validateFilter(&filter, i); err != nil {
+	for i := 0; i < len(config.Filters); i++ {
+		if err := validateFilter(&config.Filters[i], i); err != nil {
 			return err
 		}
 	}

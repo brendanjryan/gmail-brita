@@ -3,9 +3,17 @@ package filter
 import (
 	"encoding/xml"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
+
+// testdataPath returns an absolute path to a file in the testdata directory
+func testdataPath(elem ...string) string {
+	_, filename, _, _ := runtime.Caller(0)
+	return filepath.Join(filepath.Dir(filename), "..", "testdata", filepath.Join(elem...))
+}
 
 func TestBuilder(t *testing.T) {
 	tests := []struct {
@@ -15,13 +23,13 @@ func TestBuilder(t *testing.T) {
 	}{
 		{
 			name:     "simple filter",
-			yamlFile: "../testdata/filters/simple.yaml",
-			xmlFile:  "../testdata/golden/simple.xml",
+			yamlFile: testdataPath("filters", "simple.yaml"),
+			xmlFile:  testdataPath("golden", "simple.xml"),
 		},
 		{
 			name:     "complex filter",
-			yamlFile: "../testdata/filters/complex.yaml",
-			xmlFile:  "../testdata/golden/complex.xml",
+			yamlFile: testdataPath("filters", "complex.yaml"),
+			xmlFile:  testdataPath("golden", "complex.xml"),
 		},
 	}
 
