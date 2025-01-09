@@ -13,7 +13,9 @@ import (
 // testdataPath returns an absolute path to a file in the testdata directory
 func testdataPath(elem ...string) string {
 	_, filename, _, _ := runtime.Caller(0)
-	return filepath.Join(filepath.Dir(filename), "..", "..", "internal", "testdata", filepath.Join(elem...))
+	// Get the project root directory by going up two levels from the test file
+	rootDir := filepath.Join(filepath.Dir(filename), "..", "..")
+	return filepath.Join(rootDir, "internal", "testdata", filepath.Join(elem...))
 }
 
 // normalizeXML normalizes XML for comparison
