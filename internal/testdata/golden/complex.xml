@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:apps="http://schemas.google.com/apps/2006">
+  <title>Mail Filters</title>
+  <entry>
+    <category term="filter"></category>
+    <title>Mail Filter</title>
+    <apps:property name="hasTheWord" value="test:condition from:test@example.com"/>
+    <apps:property name="doesNotHaveTheWord" value="to:me@example.com cc:me@example.com"/>
+    <apps:property name="label" value="test-label"/>
+    <apps:property name="shouldArchive" value="true"/>
+    <apps:property name="shouldMarkAsRead" value="true"/>
+    <apps:property name="shouldStar" value="true"/>
+    <apps:property name="neverSpam" value="true"/>
+  </entry>
+  <entry>
+    <category term="filter"></category>
+    <title>Mail Filter</title>
+    <apps:property name="hasTheWord" value="list:test@example.com"/>
+    <apps:property name="label" value="test-list"/>
+    <apps:property name="shouldArchive" value="true"/>
+    <apps:property name="shouldMarkAsRead" value="true"/>
+  </entry>
+</feed> 
